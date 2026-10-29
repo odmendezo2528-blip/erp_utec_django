@@ -87,15 +87,3 @@ LOGGING = {
     },
 }
 
-# ── CONFIGURACIÓN EXTRA PARA RENDER (CSRF y Cookies) ────────────────
-CSRF_TRUSTED_ORIGINS = [
-    'https://erp-utec-django-1.onrender.com',
-]
-
-# Permitir que Django confíe en los headers de Render
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# Desactivar el redirect forzoso a HTTPS temporalmente (esto evita bucles)
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
