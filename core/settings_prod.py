@@ -23,14 +23,16 @@ import dj_database_url
 DEBUG      = False
 SECRET_KEY = os.environ['SECRET_KEY']   # falla intencionalmente si no existe
 
-# ── HOSTS PERMITIDOS ────────────────────────────────────────────────────────
-# Render inyecta RENDER_EXTERNAL_HOSTNAME automáticamente
+# ── HOSTS PERMITIDOS ──────────────────────────────────────────────────────
 _render_host = os.environ.get('RENDER_EXTERNAL_HOSTNAME', '')
-_extra_hosts  = os.environ.get('ALLOWED_HOSTS', '').split(',')
+_extra_hosts = os.environ.get('ALLOWED_HOSTS', '').split(',')
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1'] + (
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com'] + (
     [_render_host] if _render_host else []
 ) + [h for h in _extra_hosts if h]
+
+# ── PROXY HTTPS DE RENDER (clave para CSRF y SECURE_SSL_REDIRECT) ─────────
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # ── BASE DE DATOS: PostgreSQL via DATABASE_URL ─────────────────────────────
 DATABASES = {
@@ -41,8 +43,8 @@ DATABASES = {
     )
 }
 
-# ── CSRF: dominios de confianza ────────────────────────────────────────────
-CSRF_TRUSTED_ORIGINS = []
+# ── CSRF: dominios de confianza ───────────────────────────────────────────
+CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
 if _render_host:
     CSRF_TRUSTED_ORIGINS.append(f'https://{_render_host}')
 
