@@ -23,16 +23,14 @@ import dj_database_url
 DEBUG      = False
 SECRET_KEY = os.environ['SECRET_KEY']   # falla intencionalmente si no existe
 
-# ── HOSTS PERMITIDOS ──────────────────────────────────────────────────────
+# ── HOSTS PERMITIDOS ────────────────────────────────────────────────────────
+# Render inyecta RENDER_EXTERNAL_HOSTNAME automáticamente
 _render_host = os.environ.get('RENDER_EXTERNAL_HOSTNAME', '')
-_extra_hosts = os.environ.get('ALLOWED_HOSTS', '').split(',')
+_extra_hosts  = os.environ.get('ALLOWED_HOSTS', '').split(',')
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com'] + (
+ALLOWED_HOSTS = ['localhost', '127.0.0.1'] + (
     [_render_host] if _render_host else []
 ) + [h for h in _extra_hosts if h]
-
-# ── PROXY HTTPS DE RENDER (clave para CSRF y SECURE_SSL_REDIRECT) ─────────
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # ── BASE DE DATOS: PostgreSQL via DATABASE_URL ─────────────────────────────
 DATABASES = {
@@ -43,8 +41,8 @@ DATABASES = {
     )
 }
 
-# ── CSRF: dominios de confianza ───────────────────────────────────────────
-CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
+# ── CSRF: dominios de confianza ────────────────────────────────────────────
+CSRF_TRUSTED_ORIGINS = []
 if _render_host:
     CSRF_TRUSTED_ORIGINS.append(f'https://{_render_host}')
 
@@ -88,3 +86,16 @@ LOGGING = {
         },
     },
 }
+
+# ── CONFIGURACIÓN EXTRA PARA RENDER (CSRF y Cookies) ────────────────
+CSRF_TRUSTED_ORIGINS = [
+    'https://erp-utec-django-1.onrender.com',
+]
+
+# Permitir que Django confíe en los headers de Render
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Desactivar el redirect forzoso a HTTPS temporalmente (esto evita bucles)
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
